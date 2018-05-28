@@ -8,6 +8,11 @@
 
 #import "ViewController.h"
 
+struct ListNode {
+    int mKey;
+    struct ListNode *mNext;
+};
+
 @interface ViewController ()
 
 @end
@@ -22,7 +27,13 @@
 
 //    [self findDulElemFromArrayUnChangeArrOrder];
 
-    [self findElemFromTwoDimensions];
+//    [self findElemFromTwoDimensions];
+
+//    [self replaceSpaceWithString];
+
+//    [self replaceSpaceWithString];
+
+    [self reversalPrintLink];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -98,11 +109,9 @@
         }
         else if (findItem > temp) {
             y++;
-            continue;
         }
         else if (findItem < temp) {
             x--;
-            continue;
         }
     }
     if (has) {
@@ -111,6 +120,76 @@
     else {
         NSLog(@"没有这个数字");
     }
+}
+
+//剑指 Offer 第二版 面试题5
+- (void)replaceSpaceWithString {
+    char str1[] = "We are happy.";
+    NSLog(@"===%ld", sizeof(str1)/sizeof(char));
+    char str[100] = "We are happy.";
+    int total = sizeof(str)/sizeof(char);
+    int spaceCount = 0;
+    int oldLength = 0;
+    for (int num = 0; num < total; ++num) {
+        oldLength++;
+        if (str[num] == '\0') {
+            break;
+        }
+        if (str[num] == ' ') {
+            spaceCount++;
+        }
+    }
+    int newLength = oldLength + spaceCount*2;
+    if (newLength >= total) {
+        return;
+    }
+    
+    for (int num = oldLength; num >= 0; --num) {
+        if (str[num] != ' ') {
+            str[num + spaceCount*2] = str[num];
+        }
+        else {
+            str[num + spaceCount*2] = '2';
+            str[num + spaceCount*2 - 1] = '0';
+            str[num + spaceCount*2 - 2] = '%';
+            spaceCount--;
+        }
+    }
+    NSLog(@"---");
+}
+
+//剑指 Offer 第二版 面试题6
+- (void)reversalPrintLink {
+    struct ListNode header;
+    header.mKey = 100;
+    struct ListNode node0;
+    header.mNext = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    node4.mNext = NULL;
+    
+    [self reversalPrintLinkCore:(header.mNext)];
+}
+
+- (void)reversalPrintLinkCore:(struct ListNode *)header {
+    if (header == NULL) {
+        return;
+    }
+    if (header->mNext != NULL) {
+        [self reversalPrintLinkCore:header->mNext];
+    }
+    NSLog(@"====value====%d", header->mKey);
 }
 
 - (void)didReceiveMemoryWarning {
