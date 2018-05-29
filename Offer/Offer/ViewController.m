@@ -13,6 +13,18 @@ struct ListNode {
     struct ListNode *mNext;
 };
 
+@interface BinaryTreeNode : NSObject
+
+@property (nonatomic, assign) int mKey;
+@property (nonatomic, strong) BinaryTreeNode *mLeft;
+@property (nonatomic, strong) BinaryTreeNode *mRight;
+
+@end
+
+@implementation BinaryTreeNode
+
+@end
+
 @interface ViewController ()
 
 @end
@@ -33,7 +45,11 @@ struct ListNode {
 
 //    [self replaceSpaceWithString];
 
-    [self reversalPrintLink];
+//    [self reversalPrintLink];
+
+//    [self createLinkWithPreAndMidOrder];
+
+    [self Construct];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -191,6 +207,63 @@ struct ListNode {
     }
     NSLog(@"====value====%d", header->mKey);
 }
+
+//剑指 Offer 第二版 面试题7 （有问题）
+- (void)createLinkWithPreAndMidOrder {
+    int preOrder[] = {1, 2, 4, 7, 3, 5, 6, 8};
+    int midOrder[] = {4, 7, 2, 1, 5, 3, 8, 6};
+    [self createLinkWithPreAndMidOrderCore:preOrder preStart:0 preEnd:sizeof(preOrder)/sizeof(int) midOrder:midOrder midStart:0 midEnd:sizeof(midOrder)/sizeof(int) position:0];
+}
+
+- (void)createLinkWithPreAndMidOrderCore:(int *)preOrder preStart:(int)preStart preEnd:(int)preEnd midOrder:(int *)midOrder midStart:(int)midStart midEnd:(int)midEnd position:(int)position {
+    int currentRootMidIndex = midStart;
+    for (; currentRootMidIndex <= midEnd; ++currentRootMidIndex) {
+        if (preOrder[preStart] == midOrder[currentRootMidIndex]) {
+            NSLog(@"-----node-----%d--%d", midOrder[currentRootMidIndex], position);
+            break;
+        }
+    }
+    int leftLength = currentRootMidIndex - preStart;
+    int leftPreorderEnd = preStart + leftLength;
+    if (leftLength >= 0) {
+        [self createLinkWithPreAndMidOrderCore:preOrder preStart:preStart+1 preEnd:leftPreorderEnd midOrder:midOrder midStart:midStart midEnd:currentRootMidIndex-1 position:1];
+    }
+    if (leftLength < preEnd - preStart) {
+        [self createLinkWithPreAndMidOrderCore:preOrder preStart:leftPreorderEnd+1 preEnd:preEnd midOrder:midOrder midStart:currentRootMidIndex+1 midEnd:midEnd  position:2];
+    }
+}
+
+//剑指 Offer 第二版 面试题7 （原版）
+- (BinaryTreeNode *)Construct {
+    int preOrder[] = {1, 2, 4, 7, 3, 5, 6, 8};
+    int midOrder[] = {4, 7, 2, 1, 5, 3, 8, 6};
+    BinaryTreeNode *node = [self ConstructCore:preOrder preStart:0 preEnd:7 midOrder:midOrder midStart:0 midEnd:7];
+    return node;;
+}
+
+- (BinaryTreeNode *)ConstructCore:(int *)preOrder preStart:(int)preStart preEnd:(int)preEnd midOrder:(int *)midOrder midStart:(int)midStart midEnd:(int)midEnd {
+    int rootValue = preOrder[preStart];
+    BinaryTreeNode *node = [BinaryTreeNode new];
+    node.mLeft = nil;
+    node.mRight = nil;
+    node.mKey = rootValue;
+    int currentRootMidIndex = midStart;
+    for (; currentRootMidIndex <= midEnd; ++currentRootMidIndex) {
+        if (preOrder[preStart] == midOrder[currentRootMidIndex]) {
+            break;
+        }
+    }
+    
+    int leftLength = currentRootMidIndex - midStart;
+    if (leftLength > 0) {
+        node.mLeft = [self ConstructCore:preOrder preStart:preStart+1 preEnd:preStart+leftLength midOrder:midOrder midStart:midStart midEnd:currentRootMidIndex-1];
+    }
+    if (midEnd > currentRootMidIndex) {
+        node.mRight = [self ConstructCore:preOrder preStart:preStart+leftLength+1 preEnd:preEnd midOrder:midOrder midStart:currentRootMidIndex+1 midEnd:midEnd];
+    }
+    return node;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
