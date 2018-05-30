@@ -529,6 +529,49 @@ struct ListNode {
     return hasPath;
 }
 
+//剑指 Offer 第二版 面试题13
+- (void)arriveHowMany:(int)max rows:(int)rows cols:(int)cols {
+    if (max < 0 || rows <= 0 || cols <= 0) {
+        return;
+    }
+    
+    BOOL visited[rows * cols];
+    
+    int count = [self arriveHowMany:max rows:rows cols:cols curRow:0 curCol:0 visited:visited];
+    
+    NSLog(@"===count===%d", count);
+}
+
+- (int)arriveHowMany:(int)max rows:(int)rows cols:(int)cols curRow:(int)curRow curCol:(int)curCol visited:(BOOL *)visited {
+    int count = 0;
+    int curIndex = curRow * cols + curCol;
+    if (curRow >= 0 && curRow < rows && curCol >= 0 && curCol < cols && !visited[curIndex]) {
+        if ([self digitTotal:curCol] + [self digitTotal:curRow] > max) {
+            return 0;
+        }
+        
+        visited[curIndex] = YES;
+        
+        int leftCount = [self arriveHowMany:max rows:rows cols:cols-1 curRow:curRow curCol:curCol visited:visited];
+        int rightCount = [self arriveHowMany:max rows:rows cols:cols+1 curRow:curRow curCol:curCol visited:visited];
+        BOOL topCount = [self arriveHowMany:max rows:rows-1 cols:cols curRow:curRow curCol:curCol visited:visited];
+        BOOL bottomCount = [self arriveHowMany:max rows:rows+1 cols:cols curRow:curRow curCol:curCol visited:visited];
+        
+        count = 1 + leftCount || rightCount || topCount || bottomCount;
+    }
+    
+    return count;
+}
+
+- (int)digitTotal:(int)digit {
+    int total = 0;
+    while (digit) {
+        total += digit%10;
+        digit /= 10;
+    }
+    return total;
+}
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
