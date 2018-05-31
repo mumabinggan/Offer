@@ -136,8 +136,19 @@ struct ListNode {
 //    int min = [self findMinRotateArray];
 //    NSLog(@"====min====%d", min);
 
-    BOOL hasPath = [self hasPath];
-    NSLog(@"====hasPath====%d", hasPath);
+//    BOOL hasPath = [self hasPath];
+//    NSLog(@"====hasPath====%d", hasPath);
+
+//    int max = [self maxAfterCutDynamic:8];
+//    NSLog(@"==max==%d", max);
+    
+    int max = [self maxAfterCutDynamicOptimization:8];
+    NSLog(@"==MAX==%d", max);
+//    int max = [self maxAfterCutGreedy:8];
+//    NSLog(@"==max==%d", max);
+
+//    int max = [self maxAfterCutGreedyOptimization:8];
+//    NSLog(@"==MAX==%d", max);
 }
 
 //剑指 Offer 第二版 面试题3
@@ -570,6 +581,135 @@ struct ListNode {
         digit /= 10;
     }
     return total;
+}
+
+//剑指 Offer 第二版 面试题14 动态规划
+- (int)maxAfterCutDynamic:(int)length {
+    int value = 0;
+    int max = 0;
+    if (length <= 3) {
+        if (length < 2) {
+            value = 0;
+        }
+        if (length == 2) {
+            value = 1;
+        }
+        if (length == 3) {
+            value = 2;
+        }
+    }
+    else {
+        for (int num = 1; num <= length/2; ++num) {
+            int start = 0;
+            int end = 0;
+            int startIndex = num;
+            int endIndex = length - startIndex;
+            if (startIndex == 1) {
+                start = 1;
+            }
+            else if (startIndex == 2) {
+                start = 2;
+            }
+            else if (startIndex == 3) {
+                start = 3;
+            }
+            else {
+                start = [self maxAfterCutDynamic:startIndex];
+            }
+            if (endIndex == 1) {
+                end = 1;
+            }
+            else if (endIndex == 2) {
+                end = 2;
+            }
+            else if (endIndex == 3) {
+                end = 3;
+            }
+            else {
+                end = [self maxAfterCutDynamic:endIndex];
+            }
+            value = start * end;
+            NSLog(@"===value===%d", value);
+            if (max < value) {
+                max = value;
+            }
+        }
+    }
+    return max;
+}
+
+//剑指 Offer 第二版 面试题14 动态规划（优化）
+- (int)maxAfterCutDynamicOptimization:(int)length {
+    if (length < 2) {
+        return 0;
+    }
+    else if (length == 2) {
+        return 1;
+    }
+    else if (length == 3) {
+        return 2;
+    }
+    int production[length + 1];
+    production[0] = 0;
+    production[1] = 1;
+    production[2] = 2;
+    production[3] = 3;
+    
+    int max = 0;
+    for (int i = 4; i <= length; ++i) {
+        max = 0;
+        for (int j = 1; j <= i/2; ++j) {
+            int value = production[j] * production[i - j];
+            if (max < value) {
+                max = value;
+            }
+        }
+        production[i] = max;
+    }
+    max = production[length];
+    return max;
+}
+
+//剑指 Offer 第二版 面试题14 贪婪算法
+- (int)maxAfterCutGreedy:(int)length {
+    int value = 1;
+    while (length >= 5) {
+        length -= 3;
+        value *= 3;
+    }
+    
+    if (length == 2) {
+        value *= 2;
+    }
+    else if (length == 3) {
+        value *= 2;
+    }
+    else if (length == 4) {
+        value *= 4;
+    }
+    return value;
+}
+
+//剑指 Offer 第二版 面试题14 贪婪算法(优化)
+- (int)maxAfterCutGreedyOptimization:(int)length {
+    if (length < 2) {
+        return 0;
+    }
+    if (length == 2) {
+        return 1;
+    }
+    if (length == 3) {
+        return 2;
+    }
+    
+    int timesOf3 = length/3;
+    if (length - timesOf3 * 3 == 1) {
+        timesOf3--;
+    }
+    
+    int timesOf2 = (length - timesOf3 * 3)/2;
+    
+    return (int)(pow(3, timesOf3)) * (int)(pow(2, timesOf2));
 }
 
 
