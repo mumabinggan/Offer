@@ -142,13 +142,43 @@ struct ListNode {
 //    int max = [self maxAfterCutDynamic:8];
 //    NSLog(@"==max==%d", max);
     
-    int max = [self maxAfterCutDynamicOptimization:8];
-    NSLog(@"==MAX==%d", max);
+//    int max = [self maxAfterCutDynamicOptimization:8];
+//    NSLog(@"==MAX==%d", max);
 //    int max = [self maxAfterCutGreedy:8];
 //    NSLog(@"==max==%d", max);
 
 //    int max = [self maxAfterCutGreedyOptimization:8];
 //    NSLog(@"==MAX==%d", max);
+    
+//    int count = [self countOfOneInInt:9];
+//    NSLog(@"==count==%d", count);
+
+//    double total = [self Power:1.1 exponent:-3];
+//    NSLog(@"===total===%f", total);
+
+//    double total = [self PowerOptimization:1.1 exponent:-3];
+//    NSLog(@"===total===%f", total);
+
+//    [self printMaxInt];
+    
+//    [self printMaxInt:3];
+
+//    [self deleteNode];
+
+//    [self deleteDuplicateNode];
+
+//    BOOL isNumeric = [self isNumeric:"-1.3e2"];
+//    NSLog(@"==isNumeric==%d", isNumeric);
+
+//    [self moveForwardOdd];
+
+//    __weak id weakSelf = self;
+//    [self moveForwardOddWithBlock:^BOOL(int n) {
+//        return [weakSelf isEven:n];
+//    }];
+
+    int value = [self findKFromLast];
+    NSLog(@"==value==%d", value);
 }
 
 //剑指 Offer 第二版 面试题3
@@ -712,6 +742,339 @@ struct ListNode {
     return (int)(pow(3, timesOf3)) * (int)(pow(2, timesOf2));
 }
 
+//剑指 Offer 第二版 面试题15
+- (int)countOfOneInInt:(int)number {
+    int count = 0;
+    unsigned int flag = 1;
+    while (flag) {
+        if (number & flag) {
+            count++;
+        }
+        flag <<= 1;
+    }
+    return count;
+}
+
+//剑指 Offer 第二版 面试题16
+- (double)Power:(double)base exponent:(int)exponent {
+    if (base - 0.0 < 0.000001) {
+        return 0;
+    }
+    double total = 1;
+    int desExponent = exponent;
+    if (exponent < 0) {
+        desExponent = -exponent;
+    }
+    while (desExponent--) {
+        total *= base;
+    }
+    if (exponent < 0) {
+        total = 1.0/total;
+    }
+    return total;
+}
+
+//剑指 Offer 第二版 面试题16 优化
+- (double)PowerOptimization:(double)base exponent:(int)exponent {
+    if (base - 0.0 < 0.000001) {
+        return 0;
+    }
+    double total = 1;
+    int desExponent = exponent;
+    if (exponent < 0) {
+        desExponent = -exponent;
+    }
+    
+    total = [self PowerOptimizationFromBook:base exponent:desExponent];
+
+    if (exponent < 0) {
+        total = 1.0/total;
+    }
+    return total;
+}
+
+//剑指 Offer 第二版 面试题16 优化
+- (double)PowerOptimizationFromBook:(double)base exponent:(unsigned int)exponent {
+    if (exponent == 0) {
+        return 1;
+    }
+    if (exponent == 1) {
+        return base;
+    }
+    
+    double total = [self PowerOptimizationFromBook:base exponent:exponent>>1];
+    total *= total;
+    if ((exponent & 0x1) == 1) {
+        total *= base;
+    }
+    return total;
+}
+
+//剑指 Offer 第二版 面试题17
+- (void)printMaxInt:(int)n {
+    int total = 9;
+    while (--n) {
+        total *= 10;
+        total += 9;
+    }
+    for (int num = 0; num <= total; ++num) {
+        NSLog(@"==total==%d", num);
+    }
+}
+
+//剑指 Offer 第二版 面试题17 优化
+- (void)printMaxIntOptimization:(int)n {
+    
+}
+
+//剑指 Offer 第二版 面试题18
+- (void)deleteNode {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    node4.mNext = NULL;
+    
+    struct ListNode *deleteNode = &node0;
+    
+    if (deleteNode == NULL) {
+        return;
+    }
+    if (header->mNext == deleteNode) {
+        header = deleteNode->mNext;
+    }
+    else if (deleteNode->mNext == NULL) {
+        struct ListNode *tempNode = header;
+        while (tempNode->mNext != deleteNode) {
+            tempNode = tempNode->mNext;
+        }
+        tempNode->mNext = NULL;
+    }
+    else {
+        struct ListNode *tempNode = deleteNode->mNext->mNext;
+        deleteNode->mKey = deleteNode->mNext->mKey;
+        deleteNode->mNext = tempNode;
+    }
+    NSLog(@"----");
+}
+
+//剑指 Offer 第二版 面试题18 题目二
+- (void)deleteDuplicateNode
+ {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 0;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    node4.mNext = NULL;
+    
+    struct ListNode *startNode = NULL;
+    struct ListNode *tempNode = header;
+     if (tempNode == NULL) {
+         return;
+     }
+     
+     BOOL found = NO;
+     while (tempNode != NULL) {
+         if (tempNode->mNext != NULL) {
+             if (tempNode->mKey != tempNode->mNext->mKey) {
+                 if (found) {
+                     if (startNode == NULL) {
+                         header = tempNode->mNext;
+                         startNode = header;
+                     }
+                     else {
+                         startNode->mNext = tempNode->mNext;
+                     }
+                     found = NO;
+                 }
+                 else {
+                     startNode = tempNode;
+                 }
+             }
+             else {
+                 found = YES;
+             }
+         }
+         else {
+             if (found) {
+                 startNode->mNext = NULL;
+             }
+         }
+         tempNode = tempNode->mNext;
+     }
+    NSLog(@"----");
+}
+
+//剑指 Offer 第二版 面试题20
+//数字格式可以用 A[.[B]][e|EC]或.B[e|EC]
+- (BOOL)isNumeric:(char *)str {
+    if (str == NULL) {
+        return NO;
+    }
+    BOOL numeric = [self scanInteger:&str];
+    if (*str == '.') {
+        ++str;
+        numeric = [self scanUnsignedInteger:&str] || numeric;
+    }
+    
+    if (*str == 'e' || *str == 'E') {
+        ++str;
+        numeric = numeric && [self scanInteger:&str];
+    }
+    
+    return numeric && *str == '\0';
+}
+
+- (BOOL)scanInteger:(char **)str {
+    if (**str == '+' || **str == '-') {
+        ++(*str);
+    }
+    return [self scanUnsignedInteger:str];
+}
+
+- (BOOL)scanUnsignedInteger:(char **)str {
+    const char* before = *str;
+    while (**str >= '0' && **str <= '9' && **str != '\0') {
+        ++(*str);
+    }
+    return *str > before;
+}
+
+//剑指 Offer 第二版 面试题21
+- (void)moveForwardOdd {
+    int arr[] = {3, 22, 12, 32, 333, 22, 44, 53, 64};
+    int startIndex = 0;
+    int endIndex = sizeof(arr)/sizeof(int);
+    while (startIndex != endIndex) {
+        if ((arr[startIndex] & 0x1) == 0) {
+            if ((arr[endIndex] & 0x1) == 0) {
+                endIndex--;
+            }
+            else {
+                int temp = arr[startIndex];
+                arr[startIndex] = arr[endIndex];
+                arr[endIndex] = temp;
+                startIndex++;
+                endIndex--;
+            }
+        }
+        else {
+            ++startIndex;
+        }
+    }
+    NSLog(@"-----");
+}
+
+//剑指 Offer 第二版 面试题21 优化
+- (void)moveForwardOddWithBlock:(BOOL (^)(int))func {
+    int arr[] = {3, 22, 12, 32, 333, 22, 44, 53, 64};
+    int startIndex = 0;
+    int endIndex = sizeof(arr)/sizeof(int);
+    while (startIndex != endIndex) {
+        if (func(arr[startIndex]) == 0) {
+            if (func(arr[endIndex]) == 0) {
+                endIndex--;
+            }
+            else {
+                int temp = arr[startIndex];
+                arr[startIndex] = arr[endIndex];
+                arr[endIndex] = temp;
+                startIndex++;
+                endIndex--;
+            }
+        }
+        else {
+            ++startIndex;
+        }
+    }
+    NSLog(@"-----");
+}
+
+- (BOOL)isEven:(int)n {
+    return (n & 0x1);
+}
+
+//剑指 Offer 第二版 面试题22
+- (int)findKFromLast {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = NULL;
+    
+    return [self findKFromLastCore:header kIndex:4];
+}
+
+- (int)findKFromLastCore:(struct ListNode *)header kIndex:(int)kIndex {
+    if (header == NULL) {
+        return INT_MIN;
+    }
+    struct ListNode * startNode = NULL;
+    struct ListNode * endNode = header;
+    int count = 0;
+    while (endNode != NULL) {
+        count++;
+        endNode = endNode->mNext;
+        if (count > kIndex) {
+            if (startNode == NULL) {
+                startNode = header;
+            }
+            startNode = startNode->mNext;
+        }
+    }
+    if (startNode == NULL) {
+        return INT_MIN;
+    }
+    return startNode->mKey;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
