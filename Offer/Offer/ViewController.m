@@ -180,8 +180,10 @@ struct ListNode {
 //    int value = [self findKFromLast];
 //    NSLog(@"==value==%d", value);
     
-    int value = [self findIntersectionFromLink];
-    NSLog(@"=====value:%d==", value);
+//    int value = [self findIntersectionFromLink];
+//    NSLog(@"=====value:%d==", value);
+
+    [self mergeTwoLink];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -1155,15 +1157,130 @@ struct ListNode {
     return fastPtr->mKey;
 }
 
+//剑指 Offer 第二版 面试题24
+- (void)reverseLink {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = NULL;
+    
+    struct ListNode *node = [self reverseLinkCore:header];
+    NSLog(@"===%d===", node->mKey);
+}
 
+- (struct ListNode *)reverseLinkCore:(struct ListNode *)header {
+    struct ListNode *tempA = header;
+    struct ListNode *tempB = header;
+    struct ListNode *tempC = header->mNext;
+    while (tempC != NULL) {
+        tempB = tempC;
+        tempC = tempB->mNext;
+        tempB->mNext = tempA;
+        tempA = tempB;
+    }
+    header->mNext = NULL;
+    return tempA;
+}
 
+//剑指 Offer 第二版 面试题25
+- (void)mergeTwoLink {
+    struct ListNode *aList;
+    struct ListNode node0;
+    aList = &node0;
+    node0.mKey = 0;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node0.mNext = &node2;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node2.mNext = &node4;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node4.mNext = &node6;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node6.mNext = &node8;
+    node8.mNext = NULL;
+    
+    struct ListNode *bList;
+    struct ListNode node1;
+    bList = &node1;
+    node1.mKey = 1;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node1.mNext = &node3;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node3.mNext = &node5;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node5.mNext = &node7;
+    node7.mNext = NULL;
+    
+    struct ListNode *list = [self mergeTwoLinkCore:aList two:bList];
+    NSLog(@"====");
+}
 
-
-
-
-
-
-
+- (struct ListNode *)mergeTwoLinkCore:(struct ListNode *)aList two:(struct ListNode *)bList {
+    struct ListNode *tempA = aList;
+    struct ListNode *tempB = bList;
+    struct ListNode *mergeList = NULL;
+    struct ListNode *lastNode = mergeList;
+    while (tempA != NULL && tempB != NULL) {
+        struct ListNode *tempNode;
+        if (tempA->mKey > tempB->mKey) {
+            tempNode = tempB;
+            tempB = tempB->mNext;
+        }
+        else {
+            tempNode = tempA;
+            tempA = tempA->mNext;
+        }
+        if (lastNode == NULL) {
+            lastNode = tempNode;
+        }
+        else {
+            lastNode->mNext = tempNode;
+            lastNode = lastNode->mNext;
+        }
+        if (mergeList == NULL) {
+            mergeList = lastNode;
+        }
+    }
+    
+    if (tempA != NULL) {
+        lastNode->mNext = tempA;
+    }
+    if (tempB != NULL) {
+        lastNode->mNext = tempB;
+    }
+    return mergeList;
+}
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
