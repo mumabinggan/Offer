@@ -161,7 +161,7 @@ struct ListNode {
 
 //    [self printMaxInt];
     
-    [self printMaxInt:3];
+//    [self printMaxInt:3];
 
 //    [self deleteNode];
 
@@ -177,8 +177,11 @@ struct ListNode {
 //        return [weakSelf isEven:n];
 //    }];
 
-    int value = [self findKFromLast];
-    NSLog(@"==value==%d", value);
+//    int value = [self findKFromLast];
+//    NSLog(@"==value==%d", value);
+    
+    int value = [self findIntersectionFromLink];
+    NSLog(@"=====value:%d==", value);
 }
 
 //剑指 Offer 第二版 面试题3
@@ -1075,6 +1078,92 @@ struct ListNode {
     }
     return startNode->mKey;
 }
+
+//剑指 Offer 第二版 面试题23
+- (int)findIntersectionFromLink {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = &node6;
+    
+    return [self findIntersectionFromLinkCore:header];
+}
+
+- (int)findIntersectionFromLinkCore:(struct ListNode *)header {
+    if (header == NULL) {
+        return INT_MIN;
+    }
+    struct ListNode *slowPtr = header;
+    struct ListNode *fastPtr = header;
+    while (1) {
+        struct ListNode *temp = fastPtr->mNext;
+        if (temp == NULL) {
+            return INT_MIN;
+        }
+        if ((temp = temp->mNext) == NULL) {
+            return INT_MIN;
+        }
+        fastPtr = temp;
+        slowPtr = slowPtr->mNext;
+        if (fastPtr == slowPtr) {
+            break;
+        }
+    }
+    
+    int k = 0;
+    struct ListNode *tempNode = slowPtr;
+    while (slowPtr->mNext != tempNode) {
+        slowPtr = slowPtr->mNext;
+        k++;
+    }
+    
+    slowPtr = header;
+    fastPtr = header;
+    while (k--) {
+        slowPtr = slowPtr->mNext;
+    }
+    while (slowPtr->mNext != fastPtr) {
+        slowPtr = slowPtr->mNext;
+        fastPtr = fastPtr->mNext;
+    }
+    NSLog(@"=====%d===", fastPtr->mKey);
+    return fastPtr->mKey;
+}
+
+
+
+
+
+
+
+
+
+
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
