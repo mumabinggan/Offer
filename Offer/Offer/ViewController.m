@@ -161,7 +161,7 @@ struct ListNode {
 
 //    [self printMaxInt];
     
-//    [self printMaxInt:3];
+    [self printMaxInt:3];
 
 //    [self deleteNode];
 
