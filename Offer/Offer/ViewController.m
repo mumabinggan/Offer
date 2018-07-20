@@ -34,6 +34,12 @@ struct ListNode {
     return self;
 }
 
++ (BinaryTreeNode *)emptyBinaryTreeNode {
+    BinaryTreeNode *node = [[BinaryTreeNode alloc] init];
+    node.mKey = INT_MIN;
+    return node;
+}
+
 + (BinaryTreeNode *)createValue:(int)value {
     return [self createValue:value left:nil right:nil];
 }
@@ -283,7 +289,9 @@ struct ListNode {
 //        NSLog(@"不是正确弹出序列");
 //    }
 
-    [self printBinaryTreeInLevel];
+//    [self printBinaryTreeInLevel];
+
+    [self printBinaryTreeInLevelWithFormat];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -1770,7 +1778,101 @@ struct ListNode {
     tempNode6.mKey = 11;
     tempNode2.mRight = tempNode6;
     
-    [self printBinaryTreeInLevelCore:parentTree];
+    [self printBinaryTreeInLevelWithFormatCore:parentTree];
+}
+
+- (void)printBinaryTreeInLevelWithFormatCore:(BinaryTreeNode *)tree {
+    NSMutableArray<BinaryTreeNode *> *array = [NSMutableArray array];
+    if (array.count == 0) {
+        [array addObject:tree];
+        [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+    }
+    NSInteger index = 0;
+    while (1) {
+        if (array.count > index) {
+            BinaryTreeNode *item = array[index];
+            if (item.mKey == INT_MIN) {
+                if (array.lastObject.mKey != INT_MIN) {
+                    [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+                }
+            }
+            else {
+                if (item.mLeft) {
+                    [array addObject:item.mLeft];
+                }
+                if (item.mRight) {
+                    [array addObject:item.mRight];
+                }
+            }
+        }
+        else {
+            break;
+        }
+        index++;
+    }
+    NSMutableString *string = [NSMutableString string];
+    for (BinaryTreeNode *item in array) {
+        if (item.mKey == INT_MIN) {
+            [string appendString:@"\n"];
+        }
+        else {
+            [string appendString:[NSString stringWithFormat:@"%@ ", @(item.mKey).stringValue]];
+        }
+    }
+    NSLog(@"%@", string);
+}
+
+//剑指 Offer 第二版 面试题32 题目三
+- (void)printBinaryTreeInZhiWithFormat {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    [self printBinaryTreeInZhiWithFormatCore:parentTree];
+}
+
+- (void)printBinaryTreeInZhiWithFormatCore:(BinaryTreeNode *)tree {
+    NSMutableArray<BinaryTreeNode *> *array = [NSMutableArray array];
+    if (array.count == 0) {
+        [array addObject:tree];
+        [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+    }
+    
+    
+    
+    NSMutableString *string = [NSMutableString string];
+    for (BinaryTreeNode *item in array) {
+        if (item.mKey == INT_MIN) {
+            [string appendString:@"\n"];
+        }
+        else {
+            [string appendString:[NSString stringWithFormat:@"%@ ", @(item.mKey).stringValue]];
+        }
+    }
+    NSLog(@"%@", string);
 }
 
 - (void)didReceiveMemoryWarning {
