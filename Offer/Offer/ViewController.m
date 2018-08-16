@@ -19,9 +19,38 @@ struct ListNode {
 @property (nonatomic, strong) BinaryTreeNode *mLeft;
 @property (nonatomic, strong) BinaryTreeNode *mRight;
 
++ (BinaryTreeNode *)createValue:(int)value left:(BinaryTreeNode *)left right:(BinaryTreeNode *)right;
+
 @end
 
 @implementation BinaryTreeNode
+
+- (id)init {
+    self = [super init];
+    if (self) {
+        _mLeft = nil;
+        _mRight = nil;
+    }
+    return self;
+}
+
++ (BinaryTreeNode *)emptyBinaryTreeNode {
+    BinaryTreeNode *node = [[BinaryTreeNode alloc] init];
+    node.mKey = INT_MIN;
+    return node;
+}
+
++ (BinaryTreeNode *)createValue:(int)value {
+    return [self createValue:value left:nil right:nil];
+}
+
++ (BinaryTreeNode *)createValue:(int)value left:(BinaryTreeNode *)left right:(BinaryTreeNode *)right {
+    BinaryTreeNode *node = [[BinaryTreeNode alloc] init];
+    node.mKey = value;
+    node.mLeft = left;
+    node.mRight = right;
+    return node;
+}
 
 @end
 
@@ -35,6 +64,63 @@ struct ListNode {
 @end
 
 @implementation BinaryTreeHaveParentNode
+
+@end
+
+@interface MinStack : NSObject
+
+@end
+
+@interface MinStack ()
+
+@property (nonatomic, strong) NSMutableArray *stackMArray;
+@property (nonatomic, strong) NSMutableArray *minMArray;
+
+@end
+
+@implementation MinStack
+
+- (NSMutableArray *)stackMArray {
+    if (!_stackMArray) {
+        _stackMArray = [NSMutableArray new];
+    }
+    return _stackMArray;
+}
+
+- (NSMutableArray *)minMArray {
+    if (!_minMArray) {
+        _minMArray = [NSMutableArray new];
+    }
+    return _minMArray;
+}
+
+- (NSInteger)min {
+    NSNumber *intValue = self.minMArray.lastObject;
+    return intValue.integerValue;
+}
+
+- (void)push:(NSInteger)item {
+    [self.stackMArray addObject:@(item)];
+    NSNumber *intValue = self.minMArray.lastObject;
+    NSNumber *addValue = nil;
+    if (intValue) {
+        if (item < intValue.integerValue) {
+            addValue = @(item);
+        }
+        else {
+            addValue = intValue;
+        }
+    }
+    else {
+        addValue = @(item);
+    }
+    [self.minMArray addObject:addValue];
+}
+
+- (void)pop {
+    [self.stackMArray removeLastObject];
+    [self.minMArray removeLastObject];
+}
 
 @end
 
@@ -181,6 +267,33 @@ struct ListNode {
 //    NSLog(@"==value==%d", value);
     
     [self printLinkRingHeaderNode];
+
+    //    int value = [self findIntersectionFromLink];
+//    NSLog(@"=====value:%d==", value);
+
+//    [self mergeTwoLink];
+
+//    [self checkSubBinaryTree];
+
+//    [self mirrorBinaryTree];
+
+//    [self symmetryBinaryTree];
+
+//    [self printMatrixInClockwise];
+
+//    [self printMinStackWithO1];
+    
+//    BOOL check = [self checkRightPop];
+//    if (check) {
+//        NSLog(@"是正确弹出序列");
+//    }
+//    else {
+//        NSLog(@"不是正确弹出序列");
+//    }
+
+//    [self printBinaryTreeInLevel];
+
+    [self printBinaryTreeInLevelWithFormat];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -1152,6 +1265,692 @@ struct ListNode {
         }
     }
     return count;
+}
+
+//剑指 Offer 第二版 面试题23
+- (int)findIntersectionFromLink {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = &node6;
+    
+    return [self findIntersectionFromLinkCore:header];
+}
+
+- (int)findIntersectionFromLinkCore:(struct ListNode *)header {
+    if (header == NULL) {
+        return INT_MIN;
+    }
+    struct ListNode *slowPtr = header;
+    struct ListNode *fastPtr = header;
+    while (1) {
+        struct ListNode *temp = fastPtr->mNext;
+        if (temp == NULL) {
+            return INT_MIN;
+        }
+        if ((temp = temp->mNext) == NULL) {
+            return INT_MIN;
+        }
+        fastPtr = temp;
+        slowPtr = slowPtr->mNext;
+        if (fastPtr == slowPtr) {
+            break;
+        }
+    }
+    
+    int k = 0;
+    struct ListNode *tempNode = slowPtr;
+    while (slowPtr->mNext != tempNode) {
+        slowPtr = slowPtr->mNext;
+        k++;
+    }
+    
+    slowPtr = header;
+    fastPtr = header;
+    while (k--) {
+        slowPtr = slowPtr->mNext;
+    }
+    while (slowPtr->mNext != fastPtr) {
+        slowPtr = slowPtr->mNext;
+        fastPtr = fastPtr->mNext;
+    }
+    NSLog(@"=====%d===", fastPtr->mKey);
+    return fastPtr->mKey;
+}
+
+//剑指 Offer 第二版 面试题24
+- (void)reverseLink {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = NULL;
+    
+    struct ListNode *node = [self reverseLinkCore:header];
+    NSLog(@"===%d===", node->mKey);
+}
+
+- (struct ListNode *)reverseLinkCore:(struct ListNode *)header {
+    struct ListNode *tempA = header;
+    struct ListNode *tempB = header;
+    struct ListNode *tempC = header->mNext;
+    while (tempC != NULL) {
+        tempB = tempC;
+        tempC = tempB->mNext;
+        tempB->mNext = tempA;
+        tempA = tempB;
+    }
+    header->mNext = NULL;
+    return tempA;
+}
+
+//剑指 Offer 第二版 面试题25
+- (void)mergeTwoLink {
+    struct ListNode *aList;
+    struct ListNode node0;
+    aList = &node0;
+    node0.mKey = 0;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node0.mNext = &node2;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node2.mNext = &node4;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node4.mNext = &node6;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node6.mNext = &node8;
+    node8.mNext = NULL;
+    
+    struct ListNode *bList;
+    struct ListNode node1;
+    bList = &node1;
+    node1.mKey = 1;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node1.mNext = &node3;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node3.mNext = &node5;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node5.mNext = &node7;
+    node7.mNext = NULL;
+    
+    struct ListNode *list = [self mergeTwoLinkCore:aList two:bList];
+    NSLog(@"====");
+}
+
+- (struct ListNode *)mergeTwoLinkCore:(struct ListNode *)aList two:(struct ListNode *)bList {
+    struct ListNode *tempA = aList;
+    struct ListNode *tempB = bList;
+    struct ListNode *mergeList = NULL;
+    struct ListNode *lastNode = mergeList;
+    while (tempA != NULL && tempB != NULL) {
+        struct ListNode *tempNode;
+        if (tempA->mKey > tempB->mKey) {
+            tempNode = tempB;
+            tempB = tempB->mNext;
+        }
+        else {
+            tempNode = tempA;
+            tempA = tempA->mNext;
+        }
+        if (lastNode == NULL) {
+            lastNode = tempNode;
+        }
+        else {
+            lastNode->mNext = tempNode;
+            lastNode = lastNode->mNext;
+        }
+        if (mergeList == NULL) {
+            mergeList = lastNode;
+        }
+    }
+    
+    if (tempA != NULL) {
+        lastNode->mNext = tempA;
+    }
+    if (tempB != NULL) {
+        lastNode->mNext = tempB;
+    }
+    return mergeList;
+}
+
+//剑指 Offer 第二版 面试题26
+- (void)checkSubBinaryTree {
+    //创建父树
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 8;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 7;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 9;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 2;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 4;
+    tempNode4.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 7;
+    tempNode4.mRight = tempNode6;
+    
+    //创建子树
+    BinaryTreeNode *subTree = [[BinaryTreeNode alloc] init];
+    subTree.mKey = 8;
+
+    BinaryTreeNode *tempNode21 = [[BinaryTreeNode alloc] init];
+    tempNode21.mKey = 9;
+    subTree.mLeft = tempNode21;
+    
+    BinaryTreeNode *tempNode22 = [[BinaryTreeNode alloc] init];
+    tempNode22.mKey = 2;
+    subTree.mRight = tempNode22;
+    
+    BOOL result = [self checkSubBinaryTreeCore:parentTree subTree:subTree];
+    if (result) {
+        NSLog(@"包含");
+    }
+    else {
+        NSLog(@"不包含");
+    }
+}
+
+- (BOOL)checkSubBinaryTreeCore:(BinaryTreeNode *)parentTree subTree:(BinaryTreeNode *)subTree {
+    if (parentTree == nil) {
+        return NO;
+    }
+    BOOL contain = [self comparisonSubBinaryTreeCore:parentTree subTree:subTree];
+    if (contain) {
+        NSLog(@"找到...");
+        contain = YES;
+        return contain;
+    }
+    NSLog(@"=====%d====", parentTree.mKey);
+    contain = [self checkSubBinaryTreeCore:parentTree.mLeft subTree:subTree];
+    if (contain) {
+        contain = [self checkSubBinaryTreeCore:parentTree.mRight subTree:subTree];
+    }
+    return contain;
+}
+
+- (BOOL)comparisonSubBinaryTreeCore:(BinaryTreeNode *)parentTree subTree:(BinaryTreeNode *)subTree {
+    BOOL contain = YES;
+    if (subTree == nil) {
+        contain = YES;
+        return contain;
+    }
+    
+    if (parentTree == nil && subTree != nil) {
+        contain = NO;
+        return contain;
+    }
+    
+    if (parentTree.mKey == subTree.mKey) {
+        contain = YES;
+        contain = [self comparisonSubBinaryTreeCore:parentTree.mLeft subTree:parentTree.mLeft];
+        if (contain) {
+            contain = [self comparisonSubBinaryTreeCore:parentTree.mRight subTree:parentTree.mRight];
+        }
+    }
+    else {
+        contain = NO;
+    }
+    return contain;
+}
+
+//剑指 Offer 第二版 面试题27
+- (void)mirrorBinaryTree {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    [self mirrorBinaryTreeCore:parentTree];
+    NSLog(@"===");
+}
+
+- (void)mirrorBinaryTreeCore:(BinaryTreeNode *)originTree {
+    if (originTree == nil) {
+        return;
+    }
+    
+    BinaryTreeNode *temp = originTree.mLeft;
+    originTree.mLeft = originTree.mRight;
+    originTree.mRight = temp;
+    
+    [self mirrorBinaryTreeCore:originTree.mLeft];
+    [self mirrorBinaryTreeCore:originTree.mRight];
+}
+
+//剑指 Offer 第二版 面试题28
+- (void)symmetryBinaryTree {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    BOOL result = [self symmetryBinaryTreeCore:parentTree secondTree:parentTree];
+    if (result) {
+        NSLog(@"相等...");
+    }
+    else {
+        NSLog(@"不相等...");
+    }
+}
+
+- (BOOL)symmetryBinaryTreeCore:(BinaryTreeNode *)firstTree secondTree:(BinaryTreeNode *)secondTree {
+    if (firstTree == nil && secondTree == nil) {
+        return YES;
+    }
+    
+    if (firstTree == nil && secondTree != nil) {
+        return NO;
+    }
+    
+    if (firstTree != nil && secondTree == nil) {
+        return NO;
+    }
+    
+    if (firstTree.mKey != secondTree.mKey) {
+        return NO;
+    }
+    
+    return [self symmetryBinaryTreeCore:firstTree.mLeft secondTree:secondTree.mRight] &&
+    [self symmetryBinaryTreeCore:firstTree.mRight secondTree:secondTree.mLeft];
+}
+
+//剑指 Offer 第二版 面试题29
+- (void)printMatrixInClockwise {
+    static const int kNum = 4;
+    static const int kColumn = 4;
+    int arr[kNum][kColumn] = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12},
+        {13, 14, 15, 16}
+    };
+    [self printMatrixInClockwiseCore:NULL beginX:0 beginY:0 width:kNum height:kColumn];
+}
+
+- (void)printMatrixInClockwiseCore:(int *)tempArr beginX:(int)beginX beginY:(int)beginY width:(int)width height:(int)height {
+    static const int kNum = 4;
+    static const int kColumn = 4;
+    int arr[kNum][kColumn] = {
+        {1, 2, 3, 4},
+        {5, 6, 7, 8},
+        {9, 10, 11, 12},
+        {13, 14, 15, 16}
+    };
+    if (width <= 0 || height <= 0 || beginY < 0 || beginX < 0) {
+        return;
+    }
+    
+    int result = 0;
+    int num = 0;
+    for (num = beginX; num < beginX + width; num++) {
+        NSLog(@"%d", arr[beginY][num]);
+    }
+    result = num-1;
+    if (height > 1) {
+        for (num = beginY+1; num < beginY + height; ++num) {
+            NSLog(@"%d", arr[num][result]);
+        }
+        result = num-1;
+        if (width > 1) {
+            for (num = result-1; num >= beginX; num--) {
+                NSLog(@"%d", arr[result][num]);
+            }
+            result = num+1;
+        }
+        
+        if (width > 2) {
+            for (num = beginY+height-2; num >= beginY+1; num--) {
+                NSLog(@"%d", arr[num][beginX]);
+            }
+            result = num+1;
+        }
+    }
+    
+    [self printMatrixInClockwiseCore:tempArr beginX:beginX+1 beginY:beginY+1 width:width-2 height:height-2];
+    
+}
+
+//剑指 Offer 第二版 面试题30
+- (void)printMinStackWithO1 {
+    MinStack *minStack = [[MinStack alloc] init];
+    [minStack push:1];
+    [minStack push:4];
+    [minStack push:3];
+    NSLog(@"min = %ld", [minStack min]);
+}
+
+//剑指 Offer 第二版 面试题31
+- (BOOL)checkRightPop {
+    NSArray<NSNumber *> *inArray = @[@1, @2, @3, @4, @5];
+    NSArray<NSNumber *> *outArray = @[@4, @5, @3, @2, @1];
+    outArray = @[@4, @3, @5, @1, @2];
+    int curIndex = 0;
+    NSMutableArray<NSNumber *> *tempMArray = [NSMutableArray new];
+    int num = 0;
+    for (num = 0; num < inArray.count; ++num) {
+        [tempMArray addObject:inArray[num]];
+        while (1) {
+            NSNumber *lastValue = tempMArray.lastObject;
+            if (lastValue == nil) {
+                break;
+            }
+            if (outArray.count <= curIndex) {
+                break;
+            }
+            NSNumber *outValue = outArray[curIndex];
+            if (outValue.integerValue == lastValue.integerValue) {
+                [tempMArray removeLastObject];
+                curIndex++;
+            }
+            else {
+                break;
+            }
+        }
+        if (outArray.count == curIndex) {
+            break;
+        }
+    }
+    if (num+1 == inArray.count && curIndex == outArray.count) {
+        return YES;
+    }
+    return NO;
+}
+
+//剑指 Offer 第二版 面试题32
+- (void)printBinaryTreeInLevel {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    [self printBinaryTreeInLevelCore:parentTree];
+}
+
+- (void)printBinaryTreeInLevelCore:(BinaryTreeNode *)tree {
+    NSMutableArray<BinaryTreeNode *> *array = [NSMutableArray array];
+    if (array.count == 0) {
+        [array addObject:tree];
+    }
+    NSInteger index = 0;
+    while (1) {
+        if (array.count > index) {
+            BinaryTreeNode *item = array[index];
+            if (item.mLeft) {
+                [array addObject:item.mLeft];
+            }
+            if (item.mRight) {
+                [array addObject:item.mRight];
+            }
+        }
+        else {
+            break;
+        }
+        index++;
+    }
+    for (BinaryTreeNode *item in array) {
+        NSLog(@"%d", item.mKey);
+    }
+}
+
+//剑指 Offer 第二版 面试题32 题目二
+- (void)printBinaryTreeInLevelWithFormat {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    [self printBinaryTreeInLevelWithFormatCore:parentTree];
+}
+
+- (void)printBinaryTreeInLevelWithFormatCore:(BinaryTreeNode *)tree {
+    NSMutableArray<BinaryTreeNode *> *array = [NSMutableArray array];
+    if (array.count == 0) {
+        [array addObject:tree];
+        [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+    }
+    NSInteger index = 0;
+    while (1) {
+        if (array.count > index) {
+            BinaryTreeNode *item = array[index];
+            if (item.mKey == INT_MIN) {
+                if (array.lastObject.mKey != INT_MIN) {
+                    [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+                }
+            }
+            else {
+                if (item.mLeft) {
+                    [array addObject:item.mLeft];
+                }
+                if (item.mRight) {
+                    [array addObject:item.mRight];
+                }
+            }
+        }
+        else {
+            break;
+        }
+        index++;
+    }
+    NSMutableString *string = [NSMutableString string];
+    for (BinaryTreeNode *item in array) {
+        if (item.mKey == INT_MIN) {
+            [string appendString:@"\n"];
+        }
+        else {
+            [string appendString:[NSString stringWithFormat:@"%@ ", @(item.mKey).stringValue]];
+        }
+    }
+    NSLog(@"%@", string);
+}
+
+//剑指 Offer 第二版 面试题32 题目三
+- (void)printBinaryTreeInZhiWithFormat {
+    BinaryTreeNode *parentTree = [[BinaryTreeNode alloc] init];
+    parentTree.mKey = 8;
+    
+    BinaryTreeNode *tempNode1 = [[BinaryTreeNode alloc] init];
+    tempNode1.mKey = 6;
+    parentTree.mLeft = tempNode1;
+    
+    BinaryTreeNode *tempNode2 = [[BinaryTreeNode alloc] init];
+    tempNode2.mKey = 10;
+    parentTree.mRight = tempNode2;
+    
+    BinaryTreeNode *tempNode3 = [[BinaryTreeNode alloc] init];
+    tempNode3.mKey = 5;
+    tempNode1.mLeft = tempNode3;
+    
+    BinaryTreeNode *tempNode4 = [[BinaryTreeNode alloc] init];
+    tempNode4.mKey = 7;
+    tempNode1.mRight = tempNode4;
+    
+    BinaryTreeNode *tempNode5 = [[BinaryTreeNode alloc] init];
+    tempNode5.mKey = 9;
+    tempNode2.mLeft = tempNode5;
+    
+    BinaryTreeNode *tempNode6 = [[BinaryTreeNode alloc] init];
+    tempNode6.mKey = 11;
+    tempNode2.mRight = tempNode6;
+    
+    [self printBinaryTreeInZhiWithFormatCore:parentTree];
+}
+
+- (void)printBinaryTreeInZhiWithFormatCore:(BinaryTreeNode *)tree {
+    NSMutableArray<BinaryTreeNode *> *array = [NSMutableArray array];
+    if (array.count == 0) {
+        [array addObject:tree];
+        [array addObject:[BinaryTreeNode emptyBinaryTreeNode]];
+    }
+    
+    
+    
+    NSMutableString *string = [NSMutableString string];
+    for (BinaryTreeNode *item in array) {
+        if (item.mKey == INT_MIN) {
+            [string appendString:@"\n"];
+        }
+        else {
+            [string appendString:[NSString stringWithFormat:@"%@ ", @(item.mKey).stringValue]];
+        }
+    }
+    NSLog(@"%@", string);
 }
 
 - (void)didReceiveMemoryWarning {
