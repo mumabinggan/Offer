@@ -177,8 +177,10 @@ struct ListNode {
 //        return [weakSelf isEven:n];
 //    }];
 
-    int value = [self findKFromLast];
-    NSLog(@"==value==%d", value);
+//    int value = [self findKFromLast];
+//    NSLog(@"==value==%d", value);
+    
+    [self printLinkRingHeaderNode];
 }
 
 //剑指 Offer 第二版 面试题3
@@ -1074,6 +1076,82 @@ struct ListNode {
         return INT_MIN;
     }
     return startNode->mKey;
+}
+
+//剑指 offer 第二版 面试题23
+- (void)printLinkRingHeaderNode {
+    struct ListNode *header;
+    struct ListNode node0;
+    header = &node0;
+    node0.mKey = 0;
+    struct ListNode node1;
+    node1.mKey = 1;
+    node0.mNext = &node1;
+    struct ListNode node2;
+    node2.mKey = 2;
+    node1.mNext = &node2;
+    struct ListNode node3;
+    node3.mKey = 3;
+    node2.mNext = &node3;
+    struct ListNode node4;
+    node4.mKey = 4;
+    node3.mNext = &node4;
+    struct ListNode node5;
+    node5.mKey = 5;
+    node4.mNext = &node5;
+    struct ListNode node6;
+    node6.mKey = 6;
+    node5.mNext = &node6;
+    struct ListNode node7;
+    node7.mKey = 7;
+    node6.mNext = &node7;
+    struct ListNode node8;
+    node8.mKey = 8;
+    node7.mNext = &node8;
+    node8.mNext = &node4;
+    
+    [self printLinkRingNode:header];
+}
+
+- (void)printLinkRingNode:(struct ListNode *)header {
+    int count = [self linkRingCount:header];
+    if (count <= 0) {
+        NSLog(@"链表没有环");
+    }
+    else {
+        struct ListNode *p1 = header;
+        struct ListNode *p2 = header;
+        while (count--) {
+            p1 = p1->mNext;
+        }
+        while (1) {
+            if (p1 == p2) {
+                break;
+            }
+            p1 = p1->mNext;
+            p2 = p2->mNext;
+        }
+        NSLog(@"ring node value = %d", p1->mKey);
+    }
+}
+
+- (int)linkRingCount:(struct ListNode *)header {
+    int count = 0;
+    struct ListNode *p1 = header;
+    struct ListNode *p2 = header;
+    while (1) {
+        if (p1->mNext == NULL) {
+            count = 0;
+            return count;
+        }
+        count++;
+        p1 = p1->mNext->mNext;
+        p2 = p2->mNext;
+        if (p1 == p2) {
+            return count;
+        }
+    }
+    return count;
 }
 
 - (void)didReceiveMemoryWarning {
